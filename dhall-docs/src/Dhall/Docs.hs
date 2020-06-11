@@ -147,9 +147,10 @@ saveHtml
     -> (Path Abs File, Header)  -- ^ (Input file, Parsed header)
     -> IO (Path Abs File)       -- ^ Output path file
 saveHtml inputAbsDir outputAbsDir t@(absFile, _) = do
-    htmlOutputFile <- (outputAbsDir </>)
-            <$> (Path.stripProperPrefix inputAbsDir absFile
-                >>= addHtmlExt)
+    htmlOutputFile <- do
+        strippedPath <- Path.stripProperPrefix inputAbsDir absFile
+        strippedPathWithExt <- addHtmlExt strippedPath
+        return (outputAbsDir </> strippedPathWithExt)
 
     let htmlOutputDir = Path.parent htmlOutputFile
 
