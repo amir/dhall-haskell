@@ -20,6 +20,7 @@ module Dhall.Docs
       -- * Miscelaneous
     , saveHtml
     , createIndexes
+    , resolveRelativePath
     ) where
 
 import Data.Monoid         ((<>))
@@ -38,6 +39,10 @@ import qualified Lucid
 import qualified Options.Applicative
 import qualified Path
 import qualified Path.IO
+
+-- $setup
+-- >>> :set -XQuasiQuotes
+-- >>> import Path (absdir, absfile)
 
 {-| To specify if the tool should generate a single HTML page with all the
     package information or one for each file in your package
@@ -126,10 +131,9 @@ getAllDhallFiles baseDir = do
     loop forever
 
     Examples:
-
-    >>> resolveRelativePath $(mkAbsDir "/a/b/c/") $(mkAbsDir "/a/b/c/d/e/")
+    >>> resolveRelativePath [absdir|/a/b/c/|] [absdir|/a/b/c/d/e|]
     "../../"
-    >>> resolveRelativePath $(mkAbsDir "/a/") $(mkAbsDir "/a/")
+    >>> resolveRelativePath [absdir|/a/|] [absdir|/a/|]
     ""
 -}
 resolveRelativePath :: Path Abs Dir -> Path Abs Dir -> FilePath
@@ -172,19 +176,21 @@ saveHtml inputAbsDir outputAbsDir t@(absFile, _) = do
 {-| Create an index.html file on each folder available in the second argument
     that lists all the contents on that folder.
 
-    Examples:
+    For example,
 
-    >>> createIndexes $(mkAbsDir "/") [
-        , $(mkAbsFile "/a/b.txt")
-        , $(mkAbsFile "/a/c/b.txt")
-        , $(mkAbsFile "/a/c.txt")
+    @
+    createIndexes [absdir|/|]
+        [ [absfile|/a/b.t`xt|]
+        , [absfile|/a/c/b.txt|]
+        , [absfile|/a/c.txt"|]
         ]
+    @
 
     ... will create two index.html files:
 
-    1. $(mkAbsFile "/a/index.html"), that will list the @"/a/b.txt"@ and
-    @"/a/c.txt"@ files
-    2. $(mkAbsFile "/a/c/index.html") that will list the @"a/c/b.txt"@ file
+    1. @[absfile|/a/index.html|]@, that will list the @/a/b.txt@ and
+    @/a/c.txt@ files
+    2. @[absfile|/a/c/index.html|]@ that will list the @a/c/b.txt@ file
 
 -}
 createIndexes
