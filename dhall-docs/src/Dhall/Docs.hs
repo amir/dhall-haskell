@@ -131,10 +131,12 @@ getAllDhallFiles baseDir = do
     loop forever
 
     Examples:
-    >>> resolveRelativePath [absdir|/a/b/c/|] [absdir|/a/b/c/d/e|]
-    "../../"
-    >>> resolveRelativePath [absdir|/a/|] [absdir|/a/|]
-    ""
+
+>>> resolveRelativePath [absdir|/a/b/c/|] [absdir|/a/b/c/d/e|]
+"../../"
+>>> resolveRelativePath [absdir|/a/|] [absdir|/a/|]
+""
+
 -}
 resolveRelativePath :: Path Abs Dir -> Path Abs Dir -> FilePath
 resolveRelativePath outDir currentDir =
