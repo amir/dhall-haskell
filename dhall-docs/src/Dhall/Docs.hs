@@ -228,8 +228,8 @@ createIndexes outputPath htmlFiles packageName = do
     let filesGroupedByDir = Map.unionsWith (<>) $ map toMap htmlFiles
 
     let listDirRel dir = do
-        dirs <- fst <$> Path.IO.listDir dir
-        mapM (Path.stripProperPrefix dir) dirs
+            dirs <- fst <$> Path.IO.listDir dir
+            mapM (Path.stripProperPrefix dir) dirs
 
     let createIndex index files = do
             indexFile <- Path.fromAbsFile . (index </>) <$> Path.parseRelFile "index.html"
