@@ -1,6 +1,10 @@
 {-| Functions used to generate HTML from a dhall package.
     You can see this module as logic-less HTML building blocks for the whole
-    generator tool
+    generator tool.
+
+    There are functions that uses `FilePath` instead of `Path a b`. That is because
+    the `Path` module doesn't allows to use ".." on its paths and that is needed
+    here to properly link css and images.
 -}
 
 {-# LANGUAGE ExtendedDefaultRules #-}
@@ -38,15 +42,15 @@ removeComments (Header header)
 -- | Generates an @`Html` ()@ with all the information about a dhall file
 filePathHeaderToHtml
     :: (Path Abs File, Header) -- ^ (source file name, parsed header)
-    -> FilePath           -- ^ Relative path to the css of the tool
+    -> FilePath                -- ^ Relative path to front-end resources
     -> Html ()
-filePathHeaderToHtml (filePath, header) cssFile =
+filePathHeaderToHtml (filePath, header) relativeResourcesPath =
     html_ $ do
         head_ $ do
             title_ $ toHtml title
-            stylesheet cssFile
+            stylesheet relativeResourcesPath
         body_ $ do
-            navBar
+            navBar relativeResourcesPath
             mainContainer $ do
                 h1_ $ toHtml title
                 headerToHtml header
@@ -58,14 +62,14 @@ filePathHeaderToHtml (filePath, header) cssFile =
 indexToHtml
     :: FilePath   -- ^ Index directory
     -> [FilePath] -- ^ Generated files in that directory
-    -> FilePath   -- ^ Relative path to the css of the tool
+    -> FilePath   -- ^ RelativePath to front-end resources
     -> Html ()
-indexToHtml dir files cssFile = html_ $ do
+indexToHtml dir files relativeResourcesPath = html_ $ do
     head_ $ do
         title_ $ toHtml title
-        stylesheet cssFile
+        stylesheet relativeResourcesPath
     body_ $ do
-        navBar
+        navBar relativeResourcesPath
         mainContainer $ do
             h1_ $ toHtml title
             p_ "Exported files: "
@@ -76,11 +80,15 @@ indexToHtml dir files cssFile = html_ $ do
     title = dir <> " index"
 
 -- | nav-bar component of the HTML documentation
-navBar :: Html ()
-navBar = div_ [class_ "nav-bar"] $ do
+navBar
+    :: FilePath -- ^ Relative path to front-end resources
+    -> Html ()
+navBar relativeResourcesPath = div_ [class_ "nav-bar"] $ do
 
     -- Left side of the nav-bar
-    img_ [class_ "dhall-icon", src_ "dhall-icon.svg"]
+    img_ [ class_ "dhall-icon"
+         , src_ $ Data.Text.pack $ relativeResourcesPath <> "dhall-icon.svg"
+         ]
     p_ [class_ "package-title"] "package-name"
 
     div_ [class_ "nav-bar-content-divider"] ""
@@ -95,8 +103,8 @@ mainContainer :: Html() -> Html ()
 mainContainer = div_ [class_ "main-container"]
 
 stylesheet :: FilePath -> Html ()
-stylesheet filePath =
+stylesheet relativeResourcesPath =
     link_
         [ rel_ "stylesheet"
         , type_ "text/css"
-        , href_ $ Data.Text.pack filePath]
+        , href_ $ Data.Text.pack $ relativeResourcesPath <> "index.css"]

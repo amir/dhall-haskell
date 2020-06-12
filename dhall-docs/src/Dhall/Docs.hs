@@ -165,7 +165,7 @@ saveHtml inputAbsDir outputAbsDir t@(absFile, _) = do
     let relativeResources = resolveRelativePath outputAbsDir htmlOutputDir
 
     Lucid.renderToFile (Path.fromAbsFile htmlOutputFile)
-        $ filePathHeaderToHtml t (relativeResources <> "index.css")
+        $ filePathHeaderToHtml t relativeResources
     return htmlOutputFile
   where
     addHtmlExt :: Path b File -> IO (Path b File)
@@ -218,7 +218,7 @@ createIndexes outputPath htmlFiles = do
                 indexToHtml
                     indexTitle
                     indexList
-                    (relativeResources <> "index.css")
+                    relativeResources
 
     _ <- Map.traverseWithKey createIndex filesGroupedByDir
     return ()
