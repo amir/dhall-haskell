@@ -28,7 +28,10 @@ import Path         (Abs, Dir, File, Path, Rel)
 import qualified Control.Monad
 import qualified Data.Text
 import qualified Path
+
+#if !MIN_VERSION_path(0,7,0)
 import qualified System.FilePath as FilePath
+#endif
 
 -- | Params for commonly supplied values on the generated documentation
 data DocParams = DocParams
