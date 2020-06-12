@@ -32,7 +32,7 @@ import qualified Path
 data DocParams = DocParams
     { relativeResourcesPath :: !FilePath -- ^ Relative resource path to the
                                         --   front-end files
-    , packageName :: !Text               -- ^ Name of the package
+    , packageName :: !String               -- ^ Name of the package
     }
 
 -- | Takes a `Header` and generates its `Html`
@@ -54,13 +54,13 @@ filePathHeaderToHtml
     :: (Path Abs File, Header) -- ^ (source file name, parsed header)
     -> DocParams               -- ^ Parameters for the documentation
     -> Html ()
-filePathHeaderToHtml (filePath, header) DocParams{..} =
+filePathHeaderToHtml (filePath, header) params@DocParams{..} =
     html_ $ do
         head_ $ do
             title_ $ toHtml title
             stylesheet relativeResourcesPath
         body_ $ do
-            navBar relativeResourcesPath
+            navBar params
             mainContainer $ do
                 h1_ $ toHtml title
                 headerToHtml header
@@ -75,12 +75,12 @@ indexToHtml
     -> [Path Rel Dir]  -- ^ Generated directories in that directory
     -> DocParams       -- ^ Parameters for the documentation
     -> Html ()
-indexToHtml indexDir files dirs DocParams{..} = html_ $ do
+indexToHtml indexDir files dirs params@DocParams{..} = html_ $ do
     head_ $ do
         title_ $ toHtml title
         stylesheet relativeResourcesPath
     body_ $ do
-        navBar relativeResourcesPath
+        navBar params
         mainContainer $ do
             h1_ $ toHtml title
 
@@ -114,15 +114,15 @@ indexToHtml indexDir files dirs DocParams{..} = html_ $ do
 
 -- | nav-bar component of the HTML documentation
 navBar
-    :: FilePath -- ^ Relative path to front-end resources
+    :: DocParams -- ^ Parameters for doc generation
     -> Html ()
-navBar relativeResourcesPath = div_ [class_ "nav-bar"] $ do
+navBar DocParams{..} = div_ [class_ "nav-bar"] $ do
 
     -- Left side of the nav-bar
     img_ [ class_ "dhall-icon"
          , src_ $ Data.Text.pack $ relativeResourcesPath <> "dhall-icon.svg"
          ]
-    p_ [class_ "package-title"] "package-name"
+    p_ [class_ "package-title"] $ toHtml packageName
 
     div_ [class_ "nav-bar-content-divider"] ""
 
