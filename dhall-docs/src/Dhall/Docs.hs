@@ -227,13 +227,9 @@ createIndexes outputPath htmlFiles packageName = do
     let toMap file = Map.singleton (Path.parent file) [file]
     let filesGroupedByDir = Map.unionsWith (<>) $ map toMap htmlFiles
 
-#if MIN_VERSION_path_io(1,4,0)
-    let listDirRel = fmap fst . Path.IO.listDirRel
-#else
     let listDirRel dir = do
         dirs <- fst <$> Path.IO.listDir dir
         mapM (Path.stripProperPrefix dir) dirs
-#endif
 
     let createIndex index files = do
             indexFile <- Path.fromAbsFile . (index </>) <$> Path.parseRelFile "index.html"
