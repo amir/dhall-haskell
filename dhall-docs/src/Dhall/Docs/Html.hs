@@ -9,11 +9,13 @@
 
 {-# LANGUAGE ExtendedDefaultRules #-}
 {-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE RecordWildCards      #-}
 
 module Dhall.Docs.Html
     ( headerToHtml
     , filePathHeaderToHtml
     , indexToHtml
+    , DocParams(..)
     ) where
 
 import Data.Monoid  ((<>))
@@ -25,6 +27,13 @@ import Path         (Abs, Dir, File, Path, Rel)
 import qualified Control.Monad
 import qualified Data.Text
 import qualified Path
+
+-- | Params for commonly supplied values on the generated documentation
+data DocParams = DocParams
+    { relativeResourcesPath :: !FilePath -- ^ Relative resource path to the
+                                        --   front-end files
+    , packageName :: !Text               -- ^ Name of the package
+    }
 
 -- | Takes a `Header` and generates its `Html`
 headerToHtml :: Header -> Html ()
@@ -43,9 +52,9 @@ removeComments (Header header)
 -- | Generates an @`Html` ()@ with all the information about a dhall file
 filePathHeaderToHtml
     :: (Path Abs File, Header) -- ^ (source file name, parsed header)
-    -> FilePath                -- ^ Relative path to front-end resources
+    -> DocParams               -- ^ Parameters for the documentation
     -> Html ()
-filePathHeaderToHtml (filePath, header) relativeResourcesPath =
+filePathHeaderToHtml (filePath, header) DocParams{..} =
     html_ $ do
         head_ $ do
             title_ $ toHtml title
@@ -64,9 +73,9 @@ indexToHtml
     :: FilePath        -- ^ Index directory
     -> [Path Rel File] -- ^ Generated files in that directory
     -> [Path Rel Dir]  -- ^ Generated directories in that directory
-    -> FilePath        -- ^ RelativePath to front-end resources
+    -> DocParams       -- ^ Parameters for the documentation
     -> Html ()
-indexToHtml indexDir files dirs relativeResourcesPath = html_ $ do
+indexToHtml indexDir files dirs DocParams{..} = html_ $ do
     head_ $ do
         title_ $ toHtml title
         stylesheet relativeResourcesPath
