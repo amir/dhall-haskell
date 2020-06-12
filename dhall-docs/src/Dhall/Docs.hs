@@ -211,10 +211,13 @@ createIndexes outputPath htmlFiles = do
             indexTitle <-
                 if outputPath == index then return "package"
                 else Path.fromRelDir <$> Path.stripProperPrefix outputPath index
+            indexList <- Control.Monad.forM files $
+                fmap Path.fromRelFile . Path.stripProperPrefix outputPath
+
             Lucid.renderToFile indexFile $
                 indexToHtml
                     indexTitle
-                    (map Path.fromAbsFile files)
+                    indexList
                     (relativeResources <> "index.css")
 
     _ <- Map.traverseWithKey createIndex filesGroupedByDir
