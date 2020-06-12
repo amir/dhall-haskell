@@ -85,7 +85,7 @@ parseOptions =
             SinglePage
             (   Options.Applicative.long "single-page"
             <>  Options.Applicative.help
-                    (  "Generate a single page HTML documentation. By default,"
+                    (  "Generate a single page HTML documentation. By default, "
                     <> "the tool will generate a multi-page documentation"
                     )
             )
