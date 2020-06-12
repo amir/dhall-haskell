@@ -1,6 +1,6 @@
 # `dhall-docs`
 
-:construction: This tool is on development phase yet. It is not usable right now.
+:construction: **This tool is on development phase yet. It is not usable right now.**
 
 For installation or development instructions, see:
 
