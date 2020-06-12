@@ -46,8 +46,10 @@ filePathHeaderToHtml (filePath, header) cssFile =
             title_ $ toHtml title
             stylesheet cssFile
         body_ $ do
-            h1_ $ toHtml title
-            headerToHtml header
+            navBar
+            mainContainer $ do
+                h1_ $ toHtml title
+                headerToHtml header
   where
     title = Path.fromRelFile $ Path.filename filePath
 
@@ -64,7 +66,7 @@ indexToHtml dir files cssFile = html_ $ do
         stylesheet cssFile
     body_ $ do
         navBar
-        div_ [class_ "main-container"] $ do
+        mainContainer $ do
             h1_ $ toHtml title
             p_ "Exported files: "
             ul_ $ mconcat $ map (li_ . toHtml) files
@@ -73,7 +75,7 @@ indexToHtml dir files cssFile = html_ $ do
     title :: String
     title = dir <> " index"
 
-
+-- | nav-bar component of the HTML documentation
 navBar :: Html ()
 navBar = div_ [class_ "nav-bar"] $ do
 
@@ -87,6 +89,10 @@ navBar = div_ [class_ "nav-bar"] $ do
     p_ "Source code"
     p_ "Switch Light/Dark Mode"
     p_ "Go to package index"
+
+-- | main-container component builder of the HTML documentation
+mainContainer :: Html() -> Html ()
+mainContainer = div_ [class_ "main-container"]
 
 stylesheet :: FilePath -> Html ()
 stylesheet filePath =
