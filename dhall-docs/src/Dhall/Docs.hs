@@ -208,9 +208,12 @@ createIndexes outputPath htmlFiles = do
     let createIndex index files = do
             indexFile <- Path.fromAbsFile . (index </>) <$> Path.parseRelFile "index.html"
             let relativeResources = resolveRelativePath outputPath index
+            indexTitle <-
+                if outputPath == index then return "package"
+                else Path.fromRelDir <$> Path.stripProperPrefix outputPath index
             Lucid.renderToFile indexFile $
                 indexToHtml
-                    (Path.fromAbsDir index)
+                    indexTitle
                     (map Path.fromAbsFile files)
                     (relativeResources <> "index.css")
 
