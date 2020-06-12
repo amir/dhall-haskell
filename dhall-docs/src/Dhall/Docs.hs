@@ -15,7 +15,7 @@ module Dhall.Docs
       -- * Execution
     , main
     , defaultMain
-    , getAllDhallFiles
+    , getAllDhallFilesAndHeaders
 
       -- * Miscelaneous
     , saveHtml
