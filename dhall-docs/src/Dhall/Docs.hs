@@ -212,7 +212,7 @@ createIndexes outputPath htmlFiles = do
                 if outputPath == index then return "package"
                 else Path.fromRelDir <$> Path.stripProperPrefix outputPath index
             indexList <- Control.Monad.forM files $
-                fmap Path.fromRelFile . Path.stripProperPrefix outputPath
+                fmap Path.filename . Path.stripProperPrefix outputPath
 
             Lucid.renderToFile indexFile $
                 indexToHtml

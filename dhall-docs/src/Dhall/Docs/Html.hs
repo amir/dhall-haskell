@@ -20,7 +20,7 @@ import Data.Monoid  ((<>))
 import Data.Text    (Text)
 import Dhall.Parser (Header (..))
 import Lucid
-import Path         (Abs, File, Path)
+import Path         (Abs, File, Path, Rel)
 
 import qualified Data.Text
 import qualified Path
@@ -61,7 +61,7 @@ filePathHeaderToHtml (filePath, header) relativeResourcesPath =
 -- | Generates an index @`Html` ()@ that list all the dhall files in that folder
 indexToHtml
     :: FilePath   -- ^ Index directory
-    -> [FilePath] -- ^ Generated files in that directory
+    -> [Path Rel File] -- ^ Generated files in that directory
     -> FilePath   -- ^ RelativePath to front-end resources
     -> Html ()
 indexToHtml dir files relativeResourcesPath = html_ $ do
@@ -73,9 +73,14 @@ indexToHtml dir files relativeResourcesPath = html_ $ do
         mainContainer $ do
             h1_ $ toHtml title
             p_ "Exported files: "
-            ul_ $ mconcat $ map (li_ . toHtml) files
+            ul_ $ mconcat $ map listItem files
 
   where
+    listItem :: Path Rel File -> Html ()
+    listItem file =
+        let filePath = Data.Text.pack $ Path.fromRelFile file in
+        li_ $ a_ [href_ filePath] $ toHtml filePath
+
     title :: String
     title = dir <> " index"
 
