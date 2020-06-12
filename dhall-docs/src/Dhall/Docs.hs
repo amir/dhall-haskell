@@ -97,18 +97,18 @@ parserInfoOptions =
         <>  Options.Applicative.progDesc progDesc
         )
 
-{-| Fetches a list of all dhall files in a directory. This is not the same
-    as finding all files that ends in @.dhall@, but finds all files that
-    successfully parses as a valid dhall file.
+{-| Fetches a list of all dhall files in a directory along with its `Header`.
+    This is not the same as finding all files that ends in @.dhall@,
+    but finds all files that successfully parses as a valid dhall file.
 
     The reason it doesn't guide the search by its extension is because of the
-    dhall <https://prelude.dhall-lang.org Prelude>
+    dhall <https://prelude.dhall-lang.org Prelude>.
     That package doesn't ends any of their files in @.dhall@.
 -}
-getAllDhallFiles
+getAllDhallFilesAndHeaders
     :: Path Abs Dir -- ^ Base directory to do the search
     -> IO [(Path Abs File, Header)]
-getAllDhallFiles baseDir = do
+getAllDhallFilesAndHeaders baseDir = do
     files <- snd <$> Path.IO.listDirRecur baseDir
     Data.Maybe.catMaybes <$> mapM readDhall files
   where
@@ -228,9 +228,9 @@ defaultMain :: Options -> IO ()
 defaultMain Options{..} = do
     resolvedPackageDir <- Path.IO.resolveDir' packageDir
     resolvedOutDir <- Path.IO.resolveDir' outDir
-    dhallFiles <- getAllDhallFiles resolvedPackageDir
+    dhallFilesAndHeaders <- getAllDhallFilesAndHeaders resolvedPackageDir
     generatedHtmlFiles <-
-        mapM (saveHtml resolvedPackageDir resolvedOutDir) dhallFiles
+        mapM (saveHtml resolvedPackageDir resolvedOutDir) dhallFilesAndHeaders
     createIndexes resolvedOutDir generatedHtmlFiles
 
     dataDir <- getDataDir
