@@ -58,19 +58,8 @@ data Options = Options
     , strategy :: !GenerationStrategy -- ^ Output strategy of the tool
     , outDir :: !FilePath             -- ^ Directory where your documentation
                                       --   will be placed
+    , packageNameResolver :: !(Path Abs Dir -> String)
     }
-    deriving Show
-
-parseStrategy :: Parser GenerationStrategy
-parseStrategy =
-    Options.Applicative.flag
-        MultiPage
-        SinglePage
-        (   Options.Applicative.long "single-page"
-        <>  Options.Applicative.help
-                "Generate a single page HTML documentation. By default, the tool will generate \
-                \a multi-page documentation"
-        )
 
 -- | `Parser` for the `Options` type
 parseOptions :: Parser Options
@@ -86,6 +75,36 @@ parseOptions =
        <> Options.Applicative.metavar "OUTPUT"
        <> Options.Applicative.help "Directory where your docs will be generated"
        <> Options.Applicative.value "docs" )
+    <*> parsePackageNameResolver
+
+  where
+    parseStrategy :: Parser GenerationStrategy
+    parseStrategy =
+        Options.Applicative.flag
+            MultiPage
+            SinglePage
+            (   Options.Applicative.long "single-page"
+            <>  Options.Applicative.help
+                    (  "Generate a single page HTML documentation. By default,"
+                    <> "the tool will generate a multi-page documentation"
+                    )
+            )
+
+    parsePackageNameResolver :: Parser (Path Abs Dir -> String)
+    parsePackageNameResolver = fmap f (Options.Applicative.optional p)
+      where
+        f  Nothing = init . Path.fromRelDir . Path.dirname
+        f (Just packageName) = const packageName
+
+        p = Options.Applicative.strOption
+                (   Options.Applicative.long "package-name"
+                <>  Options.Applicative.metavar "PACKAGE-NAME"
+                <>  Options.Applicative.help
+                            (  "Override for the package name seen on HTML "
+                            <> "navbars. By default, it will extract it from "
+                            <> "the dirname of the --input flag"
+                            )
+                )
 
 -- | `ParserInfo` for the `Options` type
 parserInfoOptions :: ParserInfo Options
@@ -236,7 +255,7 @@ defaultMain Options{..} = do
 
     -- Directories on the `path` modules always ends in "/", so we have
     -- to remove last one
-    let packageName = init $ Path.fromRelDir $ Path.dirname resolvedPackageDir
+    let packageName = packageNameResolver resolvedPackageDir
 
     dhallFilesAndHeaders <- getAllDhallFilesAndHeaders resolvedPackageDir
     generatedHtmlFiles <-
