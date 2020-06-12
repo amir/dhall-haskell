@@ -86,13 +86,19 @@ indexToHtml indexDir files dirs relativeResourcesPath = html_ $ do
   where
     listFile :: Path Rel File -> Html ()
     listFile file =
-        let filePath = Data.Text.pack $ Path.fromRelFile file in
-        li_ $ a_ [href_ filePath] $ toHtml filePath
+        let fileRef = Data.Text.pack $ Path.fromRelFile file
+            itemText = Data.Text.pack $ Path.fromRelFile $ tryToTakeExt file
+        in li_ $ a_ [href_ fileRef] $ toHtml itemText
 
     listDir :: Path Rel Dir -> Html ()
     listDir dir =
         let filePath = Data.Text.pack $ Path.fromRelDir dir in
         li_ $ a_ [href_ (filePath <> "index.html")] $ toHtml filePath
+
+    tryToTakeExt :: Path Rel File -> Path Rel File
+    tryToTakeExt file = case Path.splitExtension file of
+        Nothing -> file
+        Just (f, _) -> f
 
     title :: String
     title = indexDir <> " index"
