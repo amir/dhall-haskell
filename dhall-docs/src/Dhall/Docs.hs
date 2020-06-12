@@ -214,10 +214,12 @@ createIndexes outputPath htmlFiles = do
             indexList <- Control.Monad.forM files $
                 fmap Path.filename . Path.stripProperPrefix outputPath
 
+            (dirList, _) <- Path.IO.listDirRel index
             Lucid.renderToFile indexFile $
                 indexToHtml
                     indexTitle
                     indexList
+                    dirList
                     relativeResources
 
     _ <- Map.traverseWithKey createIndex filesGroupedByDir

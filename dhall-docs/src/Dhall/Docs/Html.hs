@@ -20,8 +20,9 @@ import Data.Monoid  ((<>))
 import Data.Text    (Text)
 import Dhall.Parser (Header (..))
 import Lucid
-import Path         (Abs, File, Path, Rel)
+import Path         (Abs, Dir, File, Path, Rel)
 
+import qualified Control.Monad
 import qualified Data.Text
 import qualified Path
 
@@ -60,11 +61,12 @@ filePathHeaderToHtml (filePath, header) relativeResourcesPath =
 
 -- | Generates an index @`Html` ()@ that list all the dhall files in that folder
 indexToHtml
-    :: FilePath   -- ^ Index directory
+    :: FilePath        -- ^ Index directory
     -> [Path Rel File] -- ^ Generated files in that directory
-    -> FilePath   -- ^ RelativePath to front-end resources
+    -> [Path Rel Dir]  -- ^ Generated directories in that directory
+    -> FilePath        -- ^ RelativePath to front-end resources
     -> Html ()
-indexToHtml dir files relativeResourcesPath = html_ $ do
+indexToHtml indexDir files dirs relativeResourcesPath = html_ $ do
     head_ $ do
         title_ $ toHtml title
         stylesheet relativeResourcesPath
@@ -72,17 +74,28 @@ indexToHtml dir files relativeResourcesPath = html_ $ do
         navBar relativeResourcesPath
         mainContainer $ do
             h1_ $ toHtml title
-            p_ "Exported files: "
-            ul_ $ mconcat $ map listItem files
+
+            Control.Monad.unless (null files) $ do
+                p_ "Exported files: "
+                ul_ $ mconcat $ map listFile files
+
+            Control.Monad.unless (null dirs) $ do
+                p_ "Exported packages: "
+                ul_ $ mconcat $ map listDir dirs
 
   where
-    listItem :: Path Rel File -> Html ()
-    listItem file =
+    listFile :: Path Rel File -> Html ()
+    listFile file =
         let filePath = Data.Text.pack $ Path.fromRelFile file in
         li_ $ a_ [href_ filePath] $ toHtml filePath
 
+    listDir :: Path Rel Dir -> Html ()
+    listDir dir =
+        let filePath = Data.Text.pack $ Path.fromRelDir dir in
+        li_ $ a_ [href_ (filePath <> "index.html")] $ toHtml filePath
+
     title :: String
-    title = dir <> " index"
+    title = indexDir <> " index"
 
 -- | nav-bar component of the HTML documentation
 navBar
