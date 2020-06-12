@@ -63,13 +63,30 @@ indexToHtml dir files cssFile = html_ $ do
         title_ $ toHtml title
         stylesheet cssFile
     body_ $ do
-        h1_ $ toHtml title
-        p_ "Exported files: "
-        ul_ $ mconcat $ map (li_ . toHtml) files
+        navBar
+        div_ [class_ "main-container"] $ do
+            h1_ $ toHtml title
+            p_ "Exported files: "
+            ul_ $ mconcat $ map (li_ . toHtml) files
 
   where
     title :: String
     title = dir <> " index"
+
+
+navBar :: Html ()
+navBar = div_ [class_ "nav-bar"] $ do
+
+    -- Left side of the nav-bar
+    img_ [class_ "dhall-icon", src_ "dhall-icon.svg"]
+    p_ [class_ "package-title"] "package-name"
+
+    div_ [class_ "nav-bar-content-divider"] ""
+
+    -- Right side of the nav-bar
+    p_ "Source code"
+    p_ "Switch Light/Dark Mode"
+    p_ "Go to package index"
 
 stylesheet :: FilePath -> Html ()
 stylesheet filePath =

@@ -3,6 +3,7 @@
 -}
 
 {-# LANGUAGE CPP             #-}
+{-# LANGUAGE QuasiQuotes     #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TupleSections   #-}
 

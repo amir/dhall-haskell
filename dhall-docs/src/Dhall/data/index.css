@@ -105,6 +105,62 @@
     unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-h1, p {
+/*
+
+primary-color: #C4C4C4
+
+*/
+
+/******** Common rules ********/
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+body * {
     font-family: 'Lato';
 }
+
+/******** Nav bar **********/
+
+.nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid black;
+    padding: 0.3rem;
+}
+
+.nav-bar .dhall-icon {
+    max-width: 2.5rem;
+}
+
+.nav-bar .package-title {
+    font-size: 1.3rem;
+}
+
+.nav-bar p {
+    font-size: 1rem;
+    margin: 0;
+    margin-left: 1rem;
+}
+
+.nav-bar .nav-bar-content-divider {
+    flex: 1;
+}
+
+/******** Main content **********/
+
+.main-container {
+    padding: 2rem;
+    padding-top: 0;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    background-color: #C4C4C4;
+    font-weight: normal;
+    padding: 0.5rem;
+}
+
